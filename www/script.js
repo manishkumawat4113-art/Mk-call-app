@@ -141,36 +141,43 @@ function speakName(name) {
     const cleanName =
         cleanNameForSpeech(name);
 
-
     if (!cleanName) {
         return;
     }
 
+    if (!window.speechSynthesis) {
+        alert("Text to Speech is not supported on this device.");
+        return;
+    }
 
     window.speechSynthesis.cancel();
 
-
     const speech =
-        new SpeechSynthesisUtterance(
-            cleanName
-        );
-
+        new SpeechSynthesisUtterance(cleanName);
 
     speech.lang = "hi-IN";
-
-    speech.rate = 0.9;
-
+    speech.rate = 0.85;
     speech.pitch = 1;
-
     speech.volume = 1;
 
+    speech.onstart = function () {
+        console.log("🔊 Speaking:", cleanName);
+    };
 
-    window.speechSynthesis.speak(
-        speech
-    );
+    speech.onerror = function (event) {
+        console.log("TTS Error:", event.error);
+        alert("Voice problem: " + event.error);
+    };
+
+    window.speechSynthesis.speak(speech);
+
+    // Android WebView me kabhi-kabhi speech start karne ke
+    // liye resume() helpful hota hai.
+    setTimeout(function () {
+        window.speechSynthesis.resume();
+    }, 100);
 
 }
-
 
 /* =========================================
    CALL CONTACT
