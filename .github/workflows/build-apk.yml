@@ -47,11 +47,11 @@ jobs:
           find www -maxdepth 3 -type f | sort
 
           if [ ! -f "www/index.html" ]; then
-            echo "❌ ERROR: www/index.html not found!"
+            echo "ERROR: www/index.html not found!"
             exit 1
           fi
 
-          echo "✅ www/index.html found"
+          echo "OK: www/index.html found"
 
 
       # ==========================================
@@ -60,11 +60,11 @@ jobs:
       - name: Check App Icon
         run: |
           if [ ! -f "assets/mknote-icon.png" ]; then
-            echo "❌ ERROR: assets/mknote-icon.png not found!"
+            echo "ERROR: assets/mknote-icon.png not found!"
             exit 1
           fi
 
-          echo "✅ assets/mknote-icon.png found"
+          echo "OK: assets/mknote-icon.png found"
 
 
       # ==========================================
@@ -94,7 +94,7 @@ jobs:
 
 
       # ==========================================
-      # 9. Add Android
+      # 9. Add Android Platform
       # ==========================================
       - name: Add Android Platform
         run: |
@@ -102,36 +102,7 @@ jobs:
 
 
       # ==========================================
-      # 10. Install Pillow
-      # ==========================================
-      - name: Install Pillow
-        run: |
-          python3 -m pip install pillow
-
-            # ==========================================
-      # 11. Generate App Icons
-      # ==========================================
-      - name: Generate App Icons
-        run: |
-          python3 - <<'PY'
-          from PIL import Image
-          import os
-
-          src = "assets/mknote-icon.png"
-
-          if not os.path.exists(src):
-              print("❌ Icon not found!")
-              exit(1)
-
-          img = Image.open(src).convert("RGBA")
-          img.save(src)
-
-          print("✅ Icon ready")
-          PY
-
-
-      # ==========================================
-      # 12. Sync Capacitor
+      # 10. Sync Capacitor
       # ==========================================
       - name: Sync Capacitor
         run: |
@@ -139,7 +110,7 @@ jobs:
 
 
       # ==========================================
-      # 13. Build Debug APK
+      # 11. Build Debug APK
       # ==========================================
       - name: Build Debug APK
         run: |
@@ -149,11 +120,27 @@ jobs:
 
 
       # ==========================================
-      # 14. Upload APK
+      # 12. Check APK
+      # ==========================================
+      - name: Check APK
+        run: |
+          echo "===== APK FILES ====="
+          find android/app/build/outputs/apk -type f -name "*.apk" -print
+
+          if [ ! -f "android/app/build/outputs/apk/debug/app-debug.apk" ]; then
+            echo "ERROR: APK not found!"
+            exit 1
+          fi
+
+          echo "OK: APK successfully created!"
+
+
+      # ==========================================
+      # 13. Upload APK
       # ==========================================
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: MK-Call-APK
           path: android/app/build/outputs/apk/debug/app-debug.apk
-
+          if-no-files-found: error
