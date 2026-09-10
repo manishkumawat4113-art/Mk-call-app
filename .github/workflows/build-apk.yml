@@ -1,0 +1,110 @@
+name: Build Android APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+
+    steps:
+
+      # ==========================================
+      # 1. Checkout Repository
+      # ==========================================
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+
+      # ==========================================
+      # 2. Setup Node.js
+      # ==========================================
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+
+      # ==========================================
+      # 3. Setup Java
+      # ==========================================
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+
+      # ==========================================
+      # 4. Check Web Files
+      # ==========================================
+      - name: Check Web Files
+        run: |
+          echo "===== WEB FILES ====="
+          find www -maxdepth 3 -type f | sort
+
+          if [ ! -f "www/index.html" ]; then
+            echo "❌ ERROR: www/index.html not found!"
+            exit 1
+          fi
+
+          echo "✅ www/index.html found"
+
+
+      # ==========================================
+      # 5. Check App Icon
+      # ==========================================
+      - name: Check App Icon
+        run: |
+          if [ ! -f "assets/mknote-icon.png" ]; then
+            echo "❌ ERROR: assets/mknote-icon.png not found!"
+            exit 1
+          fi
+
+          echo "✅ assets/mknote-icon.png found"
+
+
+      # ==========================================
+      # 6. Create package.json
+      # ==========================================
+      - name: Create package.json
+        run: |
+          if [ ! -f package.json ]; then
+            npm init -y
+          fi
+
+
+      # ==========================================
+      # 7. Install Capacitor
+      # ==========================================
+      - name: Install Capacitor
+        run: |
+          npm install @capacitor/core @capacitor/cli @capacitor/android
+
+
+      # ==========================================
+      # 8. Initialize Capacitor
+      # ==========================================
+      - name: Initialize Capacitor
+        run: |
+          npx cap init "MK Expense Tracker" "com.mk.apexpense" --web-dir www
+
+
+      # ==========================================
+      # 9. Add Android
+      # ==========================================
+      - name: Add Android Platform
+        run: |
+          npx cap add android
+
+
+      # ==========================================
+      # 10. Install Pillow
+      # ==========================================
+      - name: Install Pillow
+        run: |
+          python3 -m pip install pillow
+
