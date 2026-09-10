@@ -1,4 +1,4 @@
-name: Build Android APK
+name: Build MK Call APK
 
 on:
   workflow_dispatch:
@@ -7,30 +7,35 @@ on:
       - main
 
 jobs:
+
   build-apk:
+
     runs-on: ubuntu-latest
 
     steps:
 
-      # ==========================================
-      # 1. Checkout Repository
-      # ==========================================
+      # =========================================
+      # 1. GET GITHUB CODE
+      # =========================================
+
       - name: Checkout Repository
         uses: actions/checkout@v4
 
 
-      # ==========================================
-      # 2. Setup Node.js
-      # ==========================================
+      # =========================================
+      # 2. NODE.JS
+      # =========================================
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 22
 
 
-      # ==========================================
-      # 3. Setup Java
-      # ==========================================
+      # =========================================
+      # 3. JAVA
+      # =========================================
+
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
@@ -38,12 +43,15 @@ jobs:
           java-version: 21
 
 
-      # ==========================================
-      # 4. Check Web Files
-      # ==========================================
+      # =========================================
+      # 4. CHECK WEB FILES
+      # =========================================
+
       - name: Check Web Files
         run: |
+
           echo "===== WEB FILES ====="
+
           find www -maxdepth 3 -type f | sort
 
           if [ ! -f "www/index.html" ]; then
@@ -54,124 +62,209 @@ jobs:
           echo "OK: www/index.html found"
 
 
-      # ==========================================
-      # 5. Check App Icon
-      # ==========================================
+      # =========================================
+      # 5. CHECK ICON
+      # =========================================
+
       - name: Check App Icon
         run: |
+
           if [ ! -f "assets/mknote-icon.png" ]; then
             echo "ERROR: assets/mknote-icon.png not found!"
             exit 1
           fi
 
-          echo "OK: assets/mknote-icon.png found"
+          echo "OK: App icon found"
 
 
-      # ==========================================
-      # 6. Create package.json
-      # ==========================================
+      # =========================================
+      # 6. CREATE PACKAGE.JSON
+      # =========================================
+
       - name: Create package.json
         run: |
+
           if [ ! -f package.json ]; then
             npm init -y
           fi
 
 
-      # ==========================================
-      # 7. Install Capacitor
-      # ==========================================
+      # =========================================
+      # 7. INSTALL CAPACITOR
+      # =========================================
+
       - name: Install Capacitor
         run: |
-          npm install @capacitor/core @capacitor/cli @capacitor/android
+
+          npm install \
+            @capacitor/core \
+            @capacitor/cli \
+            @capacitor/android
 
 
-      # ==========================================
-      # 8. Initialize Capacitor
-      # ==========================================
+      # =========================================
+      # 8. INSTALL NATIVE TEXT TO SPEECH
+      # =========================================
+
+      - name: Install Native Text To Speech
+        run: |
+
+          npm install \
+            @capacitor-community/text-to-speech
+
+
+      # =========================================
+      # 9. INITIALIZE CAPACITOR
+      # =========================================
+
       - name: Initialize Capacitor
         run: |
-          npx cap init "MK Call" "com.mk.call" --web-dir www
+
+          npx cap init \
+            "MK Call" \
+            "com.mk.call" \
+            --web-dir www
 
 
-      # ==========================================
-      # 9. Add Android Platform
-      # ==========================================
+      # =========================================
+      # 10. ADD ANDROID
+      # =========================================
+
       - name: Add Android Platform
         run: |
+
           npx cap add android
 
 
-      # ==========================================
-      # 10. Fix Kotlin Dependency Conflict
-      # ==========================================
-      - name: Fix Kotlin Dependencies
+      # =========================================
+      # 11. FIX KOTLIN CONFLICT
+      # =========================================
+
+      - name: Fix Kotlin Dependency Conflict
         run: |
+
           cat >> android/build.gradle <<'EOF'
 
           allprojects {
+
               configurations.all {
+
                   resolutionStrategy.eachDependency { details ->
-                      if (details.requested.group == "org.jetbrains.kotlin") {
+
+                      if (
+                          details.requested.group ==
+                          "org.jetbrains.kotlin"
+                      ) {
+
                           details.useVersion "1.8.22"
+
                       }
+
                   }
+
               }
+
           }
+
           EOF
 
           echo "OK: Kotlin dependency resolution added"
 
 
-      # ==========================================
-      # 11. Sync Capacitor
-      # ==========================================
+      # =========================================
+      # 12. SYNC CAPACITOR + TTS
+      # =========================================
+
       - name: Sync Capacitor
         run: |
+
           npx cap sync android
 
 
-      # ==========================================
-      # 12. Clean Android Build
-      # ==========================================
+      # =========================================
+      # 13. CHECK TTS PLUGIN
+      # =========================================
+
+      - name: Check TTS Plugin
+        run: |
+
+          echo "===== TTS PLUGIN ====="
+
+          npm list @capacitor-community/text-to-speech
+
+          echo "===== ANDROID PLUGINS ====="
+
+          find android -type f | grep -i "text.to.speech" || true
+
+
+      # =========================================
+      # 14. CLEAN ANDROID BUILD
+      # =========================================
+
       - name: Clean Android Build
         run: |
+
           cd android
+
           chmod +x gradlew
+
           ./gradlew clean
 
 
-      # ==========================================
-      # 13. Build Debug APK
-      # ==========================================
+      # =========================================
+      # 15. BUILD APK
+      # =========================================
+
       - name: Build Debug APK
         run: |
+
           cd android
+
           chmod +x gradlew
+
           ./gradlew assembleDebug
 
 
-      # ==========================================
-      # 14. Check APK
-      # ==========================================
+      # =========================================
+      # 16. CHECK APK
+      # =========================================
+
       - name: Check APK
         run: |
-          echo "===== APK FILES ====="
-          find android/app/build/outputs/apk -type f -name "*.apk" -print
 
-          if [ ! -f "android/app/build/outputs/apk/debug/app-debug.apk" ]; then
+          echo "===== APK FILES ====="
+
+          find android/app/build/outputs/apk \
+            -type f \
+            -name "*.apk" \
+            -print
+
+          if [
+            ! -f
+            "android/app/build/outputs/apk/debug/app-debug.apk"
+          ]; then
+
             echo "ERROR: APK not found!"
+
             exit 1
+
           fi
 
           echo "OK: APK successfully created!"
 
 
-      # ==========================================
-      # 15. Upload APK
-      # ==========================================
+      # =========================================
+      # 17. UPLOAD APK
+      # =========================================
+
       - name: Upload APK
         uses: actions/upload-artifact@v4
+
         with:
+
           name: MK-Call-APK
-          path: android/app/build/outputs/apk/debug/app-debug.apk
+
+          path:
+            android/app/build/outputs/apk/debug/app-debug.apk
+
           if-no-files-found: error
