@@ -25,7 +25,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
 
 
       # ==========================================
@@ -102,7 +102,28 @@ jobs:
 
 
       # ==========================================
-      # 10. Sync Capacitor
+      # 10. Fix Kotlin Dependency Conflict
+      # ==========================================
+      - name: Fix Kotlin Dependencies
+        run: |
+          cat >> android/build.gradle <<'EOF'
+
+          allprojects {
+              configurations.all {
+                  resolutionStrategy.eachDependency { details ->
+                      if (details.requested.group == "org.jetbrains.kotlin") {
+                          details.useVersion "1.8.22"
+                      }
+                  }
+              }
+          }
+          EOF
+
+          echo "OK: Kotlin dependency resolution added"
+
+
+      # ==========================================
+      # 11. Sync Capacitor
       # ==========================================
       - name: Sync Capacitor
         run: |
@@ -110,7 +131,17 @@ jobs:
 
 
       # ==========================================
-      # 11. Build Debug APK
+      # 12. Clean Android Build
+      # ==========================================
+      - name: Clean Android Build
+        run: |
+          cd android
+          chmod +x gradlew
+          ./gradlew clean
+
+
+      # ==========================================
+      # 13. Build Debug APK
       # ==========================================
       - name: Build Debug APK
         run: |
@@ -120,7 +151,7 @@ jobs:
 
 
       # ==========================================
-      # 12. Check APK
+      # 14. Check APK
       # ==========================================
       - name: Check APK
         run: |
@@ -136,7 +167,7 @@ jobs:
 
 
       # ==========================================
-      # 13. Upload APK
+      # 15. Upload APK
       # ==========================================
       - name: Upload APK
         uses: actions/upload-artifact@v4
