@@ -133,10 +133,10 @@ function cleanNameForSpeech(name) {
 
 
 /* =========================================
-   SPEAK CONTACT NAME
+   NATIVE ANDROID TEXT TO SPEECH
 ========================================= */
 
-function speakName(name) {
+async function speakName(name) {
 
     const cleanName =
         cleanNameForSpeech(name);
@@ -145,37 +145,78 @@ function speakName(name) {
         return;
     }
 
-    if (!window.speechSynthesis) {
-        alert("Text to Speech is not supported on this device.");
-        return;
+    try {
+
+        // Capacitor native TTS plugin
+        const TTS =
+            window.Capacitor &&
+            window.Capacitor.Plugins &&
+            window.Capacitor.Plugins.TextToSpeech;
+
+        if (!TTS) {
+
+            alert(
+                "Native TTS plugin nahi mila."
+            );
+
+            console.log(
+                "TextToSpeech plugin not found"
+            );
+
+            return;
+        }
+
+        // Pehle previous speech stop
+        try {
+
+            await TTS.stop();
+
+        } catch (stopError) {
+
+            console.log(
+                "TTS stop:",
+                stopError
+            );
+
+        }
+
+        // Native Android TTS
+        await TTS.speak({
+
+            text: cleanName,
+
+            lang: "hi-IN",
+
+            rate: 0.85,
+
+            pitch: 1.0,
+
+            volume: 1.0,
+
+            queueStrategy: 0
+
+        });
+
+        console.log(
+            "🔊 Native TTS:",
+            cleanName
+        );
+
     }
 
-    window.speechSynthesis.cancel();
+    catch (error) {
 
-    const speech =
-        new SpeechSynthesisUtterance(cleanName);
+        console.error(
+            "Native TTS Error:",
+            error
+        );
 
-    speech.lang = "hi-IN";
-    speech.rate = 0.85;
-    speech.pitch = 1;
-    speech.volume = 1;
+        alert(
+            "Voice start nahi ho paayi: " +
+            (error.message || error)
+        );
 
-    speech.onstart = function () {
-        console.log("🔊 Speaking:", cleanName);
-    };
-
-    speech.onerror = function (event) {
-        console.log("TTS Error:", event.error);
-        alert("Voice problem: " + event.error);
-    };
-
-    window.speechSynthesis.speak(speech);
-
-    // Android WebView me kabhi-kabhi speech start karne ke
-    // liye resume() helpful hota hai.
-    setTimeout(function () {
-        window.speechSynthesis.resume();
-    }, 100);
+    }
 
 }
 
