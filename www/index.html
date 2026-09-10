@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+    <title>MK Contacts</title>
+
+    <link rel="stylesheet" href="styles.css">
+
+</head>
+
+
+<body>
+
+    <div class="app">
+
+        <!-- HEADER -->
+
+        <header class="header">
+
+            <div class="topRow">
+
+                <h1>Contacts</h1>
+
+                <button id="addBtn">
+                    ＋
+                </button>
+
+            </div>
+
+
+            <!-- SEARCH -->
+
+            <div class="searchBox">
+
+                <span>🔍</span>
+
+                <input
+                    type="text"
+                    id="searchInput"
+                    placeholder="Search contacts">
+
+            </div>
+
+        </header>
+
+
+        <!-- FAVORITES -->
+
+        <section class="favoritesSection">
+
+            <h2>Favorites</h2>
+
+            <div id="favoritesList"></div>
+
+        </section>
+
+
+        <!-- CONTACTS -->
+
+        <section class="contactsSection">
+
+            <h2>All Contacts</h2>
+
+            <div id="contactList"></div>
+
+        </section>
+
+
+        <!-- ADD CONTACT MODAL -->
+
+        <div
+            id="addModal"
+            class="modal hidden">
+
+            <div class="modalBox">
+
+                <h2>Add Contact</h2>
+
+                <input
+                    type="text"
+                    id="newName"
+                    placeholder="Name">
+
+                <input
+                    type="tel"
+                    id="newNumber"
+                    placeholder="Phone number">
+
+                <div class="modalButtons">
+
+                    <button id="cancelBtn">
+                        Cancel
+                    </button>
+
+                    <button id="saveBtn">
+                        Save
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+    <script src="script.js"></script>
+
+</body>
+
+</html>
