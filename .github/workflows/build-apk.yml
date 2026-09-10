@@ -90,7 +90,7 @@ jobs:
       # ==========================================
       - name: Initialize Capacitor
         run: |
-          npx cap init "MK Call" "com.mk.Call" --web-dir www
+          npx cap init "MK Call" "com.mk.call" --web-dir www
 
 
       # ==========================================
