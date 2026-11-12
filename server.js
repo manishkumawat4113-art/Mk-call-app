@@ -91,6 +91,35 @@ app.put("/api/users/:id", (req, res) => {
 
 });
 
+app.patch("/api/users/:id", (req, res) => {
+
+  const id = Number(req.params.id);
+
+  const user = users.find(u => u.id === id);
+
+  if (!user) {
+    return res.status(404).json({
+      success: false,
+      message: "User not found"
+    });
+  }
+
+  if (req.body.name !== undefined) {
+    user.name = req.body.name;
+  }
+
+  if (req.body.age !== undefined) {
+    user.age = req.body.age;
+  }
+
+  res.json({
+    success: true,
+    message: "User partially updated",
+    data: user
+  });
+
+});
+
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, "0.0.0.0", () => {
