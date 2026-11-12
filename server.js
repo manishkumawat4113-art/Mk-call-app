@@ -33,6 +33,64 @@ app.get("/api/users", (req, res) => {
   });
 });
 
+app.post("/api/users", (req, res) => {
+  const { name, age } = req.body;
+
+  if (!name || !Number.isInteger(age) || age <= 0) {
+    return res.status(400).json({
+      success: false,
+      message: "Valid name and age are required"
+    });
+  }
+
+  const newUser = {
+    id: users.length + 1,
+    name,
+    age
+  };
+
+  users.push(newUser);
+
+  res.status(201).json({
+    success: true,
+    message: "User added successfully",
+    data: newUser
+  });
+});
+
+
+// PUT - Update user
+
+app.put("/api/users/:id", (req, res) => {
+
+  console.log("PUT API CALLED");
+
+  console.log("ID:", req.params.id);
+
+  console.log("BODY:", req.body);
+
+  const id = Number(req.params.id);
+
+  const user = users.find(u => u.id === id);
+
+  if (!user) {
+    return res.status(404).json({
+      success: false,
+      message: "User not found"
+    });
+  }
+
+  user.name = req.body.name;
+  user.age = req.body.age;
+
+  res.json({
+    success: true,
+    message: "User updated",
+    data: user
+  });
+
+});
+
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, "0.0.0.0", () => {
