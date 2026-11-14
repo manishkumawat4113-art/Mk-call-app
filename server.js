@@ -82,16 +82,20 @@ app.post("/api/auth/register", async (req, res) => {
             message: "Account created successfully"
         });
 
-    } catch (error) {
+   catch (error) {
 
-        console.log(error);
+    console.log("ACCOUNT CREATION ERROR");
+    console.log("Error Name:", error.name);
+    console.log("Error Message:", error.message);
+    console.log("Error Code:", error.code);
 
-        res.status(500).json({
-            success: false,
-            message: "Account creation failed"
-        });
+    res.status(500).json({
+        success: false,
+        message: "Account creation failed",
+        error: error.message
+    });
 
-    }
+}
 
 });
 
