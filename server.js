@@ -82,7 +82,7 @@ app.post("/api/auth/register", async (req, res) => {
             message: "Account created successfully"
         });
 
-   catch (error) {
+    }  catch (error) {
 
     console.log("ACCOUNT CREATION ERROR");
     console.log("Error Name:", error.name);
