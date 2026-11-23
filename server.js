@@ -99,6 +99,54 @@ app.post("/api/auth/register", async (req, res) => {
 
 });
 
+
+app.post("/login", async (req, res) => {
+    console.log("LOGIN ROUTE HIT");
+  try {
+    const { email, password } = req.body;
+
+    // 1. Email se user find karo
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(404).json({
+        message: "Account nahi mila"
+      });
+    }
+
+    // 2. Password verify karo
+    const isMatch = await bcrypt.compare(
+      password,
+      user.password
+    );
+
+    if (!isMatch) {
+      return res.status(401).json({
+        message: "Wrong password"
+      });
+    }
+
+    // 3. Login successful
+    res.status(200).json({
+      message: "Login successful",
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email
+      }
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      message: "Server error",
+      error: error.message
+    });
+  }
+});
+
+
+
+
 // ===================================
 // START SERVER
 // ===================================
