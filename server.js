@@ -18,20 +18,11 @@ mongoose.connect(process.env.MONGO_URI)
 })
 .catch((error) => {
     console.log("MongoDB Connection Failed");
-
     console.log("Error Name:", error.name);
     console.log("Error Message:", error.message);
     console.log("Error Code:", error.code);
 });
 
-/*mongoose.connect(process.env.MONGO_URI)
-.then(() => {
-    console.log("MongoDB Connected Successfully");
-})
-.catch((error) => {
-    console.log("MongoDB Connection Failed:", error.message);
-});
-app.use(express.urlencoded({ extended: true }));*/
 app.get("/", (req, res) => {
   res.send("MK Account Backend Running");
 });
@@ -50,21 +41,18 @@ app.post("/api/auth/register", async (req, res) => {
         const existingUser = await User.findOne({
             email: email.toLowerCase().trim()
         });
-
         if (existingUser) {
             return res.status(409).json({
                 success: false,
                 message: "Email already registered"
             });
         }
-
  if (password.length < 8) {
     return res.status(400).json({
         success: false,
         message: "Password must be at least 8 characters"
     });
 }
-        
         // Hash password
         const hashedPassword = await bcrypt.hash(password, 12);
   // Create new user
@@ -73,59 +61,46 @@ app.post("/api/auth/register", async (req, res) => {
             email: email.toLowerCase().trim(),
             password: hashedPassword
         });
-
         // Save in MongoDB
         await newUser.save();
-
         res.status(201).json({
             success: true,
             message: "Account created successfully"
         });
-
     }  catch (error) {
-
     console.log("ACCOUNT CREATION ERROR");
     console.log("Error Name:", error.name);
     console.log("Error Message:", error.message);
-    console.log("Error Code:", error.code);
-
+    console.log("Error Code:", error.code)
     res.status(500).json({
         success: false,
         message: "Account creation failed",
         error: error.message
     });
-
 }
-
 });
-
 
 app.post("/login", async (req, res) => {
     console.log("LOGIN ROUTE HIT");
   try {
     const { email, password } = req.body;
-
     // 1. Email se user find karo
     const user = await User.findOne({ email });
-
     if (!user) {
       return res.status(404).json({
         message: "Account nahi mila"
       });
     }
-
     // 2. Password verify karo
     const isMatch = await bcrypt.compare(
       password,
       user.password
     );
-
     if (!isMatch) {
       return res.status(401).json({
         message: "Wrong password"
       });
     }
-
     // 3. Login successful
     res.status(200).json({
       message: "Login successful",
@@ -135,7 +110,6 @@ app.post("/login", async (req, res) => {
         email: user.email
       }
     });
-
   } catch (error) {
     res.status(500).json({
       message: "Server error",
@@ -144,8 +118,21 @@ app.post("/login", async (req, res) => {
   }
 });
 
+app.get("/api/auth/me/:id",async (req,res) =>{
+    try{
+        const {id}=req.params
+        const mk=await User.findOne({_id:id}).select("name email");
 
-
+        if (!mk) {
+      return res.status(404).json({
+        message: "current user nahi mila"
+      });
+    }
+        res.json({message:"fetching",mk})
+    }catch(error){
+        res.json({message:error.message})
+    }
+})
 
 // ===================================
 // START SERVER
