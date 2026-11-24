@@ -6,4 +6,5 @@ router.get("/", mk)
 router.post("/api/auth/register", signup)
 router.post("/login",login)
 router.get("/api/auth/me/:id",profiledata)
+
 export default router

@@ -39,6 +39,7 @@ export const signup=async (req, res) => {
             email: email.toLowerCase().trim(),
             password: hashedPassword
         });
+
         // Save in MongoDB
         await newUser.save();
         res.status(201).json({
