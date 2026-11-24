@@ -4,7 +4,7 @@ const bcrypt = require("bcryptjs");*/
 import express from "express"
 //const mongoose = require("mongoose");
 const app=express()
-//app.use(express.json())*/
+app.use(express.json())
 
 import {connectedDb} from "./db.js"
 await connectedDb()
