@@ -1,3 +1,6 @@
+import User from "./models/User"
+import bcrypt from "bcryptjs"
+
 export const mk=(req, res) => {
   res.send("MK Account Backend Running");
 }
