@@ -1,33 +1,23 @@
-require("dotenv").config();
-const User = require("./models/User");
-const bcrypt = require("bcryptjs");
-const express=require("express")
-const mongoose = require("mongoose");
+import "dotenv/config"
+/*const User = require("./models/User");
+const bcrypt = require("bcryptjs");*/
+import express from "express"
+//const mongoose = require("mongoose");
 const app=express()
-app.use(express.json())
+//app.use(express.json())*/
 
-const PORT = process.env.PORT || 3000;
+import {connectedDb} from "./db.js"
+await connectedDb()
+const PORT = process.env.Port
 
-mongoose.connect(process.env.MONGO_URI)
-.then(() => {
-    console.log("MongoDB Connected Successfully");
+import router from "./routers.js"
+app.use(router)
 
-    app.listen(PORT, () => {
-        console.log(`MK Account Server running on port ${PORT}`);
-    });
+app.listen(PORT,()=>{
+    console.log("server is running")
 })
-.catch((error) => {
-    console.log("MongoDB Connection Failed");
-    console.log("Error Name:", error.name);
-    console.log("Error Message:", error.message);
-    console.log("Error Code:", error.code);
-});
 
-app.get("/", (req, res) => {
-  res.send("MK Account Backend Running");
-});
-
-app.post("/api/auth/register", async (req, res) => {
+/*app.post("/api/auth/register", async (req, res) => {
     try {
     const { name, email, password } = req.body;
     if (!name || !email || !password) {

@@ -14,7 +14,8 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs",
+  "type": "module",
+    "type": "common.js",
   "bugs": {
     "url": "https://github.com/manishkumawat4113-art/Mk-call-app/issues"
   },
