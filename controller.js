@@ -99,7 +99,7 @@ export const login= async (req, res) => {
 export const profiledata=async (req,res) =>{
     try{
         const {id}=req.params
-        const mk=await User.findOne({_id:id}).select("name email");
+        const mk=await User.findOne({_id:id}).select("name email createdAt");
 
         if (!mk) {
       return res.status(404).json({
